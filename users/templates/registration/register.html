@@ -1,0 +1,30 @@
+ {% extends "base.html" %}
+ {% block content %}
+
+ <div class='w-1/2 mx-auto my-9'>
+          {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+              {{error}}
+            {% endfor %}
+          {% endif %}
+    <form action="" method='POST' >
+        {% csrf_token %}
+         {% for field in form  %}
+          <p>
+            <label for="{{field.id_for_label}}">{{field.label}}</label>
+             {{field}}
+             {% if field.errors %}
+             <ul>
+                  {% for errors in field.errors %}
+                  <li>{{errors}}</li>
+                  {% endfor %}
+                </ul>
+             {% endif %}
+          </p>
+         {% endfor %}
+        <button type="submit" class='bg-rose-500 px-2 py-2 rounded-md mt-3 text-white mb-4 '>Sign Up</button>
+        
+    </form>
+ </div>
+ {% endblock content %}
+
