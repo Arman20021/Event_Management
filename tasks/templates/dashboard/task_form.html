@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Management</title>
+    <link rel="stylesheet" href="{% static "css/output.css" %}">
+  </head>
+  <body class="min-h-screen" style="background-image: url('{% static "images/image2.jpg" %}'); background-size: cover; background-position: center;">
+    <h1 class="text-3xl font-bold text-black mb-6 text-center">
+        Create Event
+    </h1>
+ <div class=" w-1/2 mx-auto mt-8">
+     <div>
+      {% if messages %}
+        {% for message in messages %}
+        <div class="px-2 py-1 {% if message.tags == 'success' %}bg-green-500{% endif %}" >
+          {{message}}
+        </div>  
+        {% endfor %}
+       
+      {% endif %}
+    </div>
+    <form method="POST" enctype="multipart/form-data"> 
+    {% csrf_token %}
+    {{ task_form.as_p }}
+    {{ task_detail_form.as_p }}
+    <button type="submit" class="bg-rose-500 px-3 py-2  text-white mt-2 rounded-md mx-40">Submit</button>
+</form>
+ </div>
+  </body>
+</html>

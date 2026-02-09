@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <title>Event Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Background Wrapper -->
+  <div class="bg-cover bg-center min-h-screen" style="background-image: url('{% static 'images/image1.jpg' %}');">
+
+    <!-- Navbar -->
+    <nav class="bg-white/20 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <h1 class="text-xl font-semibold text-white">Event Management</h1>
+        <div class="space-x-6">
+          <a href="{% url 'event_manage' %}" class="text-white hover:text-blue-300 font-medium text-xl">Home</a>
+          <a href="{% url 'manager-dashboard' %}" class="text-white hover:text-blue-300 font-medium text-xl">Dashboard</a>
+          <a href="{% url 'create-task' %}" class="text-white hover:text-blue-300 font-medium text-xl" >Create Event</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Search Bar -->
+    <div class="max-w-3xl mx-auto mt-6 py-4">
+      <form method="GET" action="{% url 'manager-dashboard' %}" class="flex gap-3">
+ 
+        <input type="hidden" name="type" value="{{ type|default:'all' }}">
+  <input
+      type="text"
+      name="q"
+      placeholder="Search by title..."
+      value="{{ query|default:'' }}"
+      class="w-full px-4 py-4 rounded-md bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+  <button
+      type="submit"
+      class="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+  >
+      Search
+  </button>
+</form>
+
+    </div>
+
+    <!-- Task List -->
+<div class="max-w-6xl mx-auto mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+  {% if tasks %}
+    {% for task in tasks %}
+      <a href="{% url 'task-detail' task.id %}" class="block bg-white/20 backdrop-blur-md rounded-xl overflow-hidden hover:shadow-xl transition">
+        {% if task.image %}
+          <img src="{{ task.image.url }}" alt="{{ task.title }}" class="w-full h-48 object-cover">
+        {% else %}
+          <img src="{% static 'images/task-placeholder.jpg' %}" alt="No image" class="w-full h-48 object-cover">
+        {% endif %}
+        <div class="p-4">
+          <h3 class="text-white font-semibold text-lg">{{ task.title }}</h3>
+          <p class="text-white text-sm mt-2">{{ task.status }}</p>
+        </div>
+      </a>
+    {% endfor %}
+  {% else %}
+    <p class="text-white text-center col-span-full mt-6"> </p>
+  {% endif %}
+
+</div>
+
+
+
+<div>
+  <h1 class="text-white text-3xl px-9 font-serif font-bold ">Featured Event :</h1>
+
+</div>
+
+
+  <div class="px-10 py-10 flex justify-between">
+  <div>
+   <img src="{% static 'images/image4.jpg' %}" alt="Image">
+   <h1 class="text-xl text-white px-2 py-2 font-bold">Worship Night</h1>
+   <h1 class="text-xl text-white px-2 font-bold">Date: 31 January 2026</h1>
+  </div>
+  <div>
+   <img src="{% static 'images/image5.jpg' %}" alt="Image">
+   <h1 class="text-xl text-white px-2 py-2 font-bold">Worship Night</h1>
+   <h1 class="text-xl text-white px-2 font-bold">Date: 31 January 2026</h1>
+  </div>
+  <div>
+   <img src="{% static 'images/image6.jpg' %}" alt="Image">
+   <h1 class="text-xl text-white px-2 py-2 font-bold">Worship Night</h1>
+   <h1 class="text-xl text-white px-2 font-bold">Date: 31 January 2026</h1>
+  </div>
+  <div>
+   <img src="{% static 'images/image7.jpg' %}" alt="Image">
+   <h1 class="text-xl text-white px-2 py-2 font-bold">Worship Night</h1>
+   <h1 class="text-xl text-white px-2 font-bold">Date: 31 January 2026</h1>
+  </div>
+</div>
+
+
+  </div>
+
+
+</body>
+</html>

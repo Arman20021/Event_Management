@@ -1,0 +1,360 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{% endblock title %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+    
+    <link rel="stylesheet" href="{% static "css/output.css" %}">
+    <style>
+        body
+        {
+            font-family: "Inter",sans-serif;
+        }
+    </style>
+  </head>
+  <body class="font-sans bg-gray-100">
+    {% if request.user.is_authenticated %}
+        <header class="bg-white shadow-md">
+    <nav class="container mx-auto px-6 py-3">
+      <div class="flex justify-between items-center">
+        <a href="index.html" class="text-xl font-bold text-gray-800"
+          >Event Master</a
+        >
+        <div class="hidden md:flex space-x-4">
+          <a
+            href="{% url 'dashboard' %}"
+            class="text-gray-600 hover:text-gray-800"
+            >Dashboard</a
+          >
+         
+        
+          <a
+            href="{% url 'my-events' %}"
+            class="text-gray-600 hover:text-gray-800"
+            >My Event</a
+          >
+        </div>
+        <div class="flex items-center">
+          <div class="relative">
+            <button
+              id="user-menu-button"
+              class="flex items-center focus:outline-none"
+            >
+              <img
+                class="h-8 w-8 rounded-full object-cover"
+                src="https://placekitten.com/100/100"
+                alt="User avatar"
+              />
+            </button>
+            <div
+              id="user-menu"
+              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden"
+            >
+              <a
+                href="{% url 'dashboard' %}"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >Dashboard</a
+              >
+              <form method="post" action="{% url 'sign_out' %}">
+                  {% csrf_token %}
+                <button
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Logout
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="md:hidden ml-4">
+            <button
+              id="menu-toggle"
+              class="text-gray-600 hover:text-gray-800 focus:outline-none"
+            >
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16m-7 6h7"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="mobile-menu" class="md:hidden hidden mt-4">
+        <a href="#" class="block py-2 text-gray-600 hover:text-gray-800"
+          >Dashboard</a
+        >
+        {% comment %} <a href="#" class="block py-2 text-gray-600 hover:text-gray-800"
+          >Tasks</a
+        >
+        <a href="#" class="block py-2 text-gray-600 hover:text-gray-800"
+          >Groups</a
+        >
+        <a href="#" class="block py-2 text-gray-600 hover:text-gray-800"
+          >Create Group</a {% endcomment %}
+        >
+      </div>
+    </nav>
+  </header>
+    {% else %}
+        {% include "non_logged_nav.html" %}
+    {% endif %}
+
+    <main>
+  
+    </main>
+
+              
+    <div class ='w-[1450px] mx-auto'>
+        <div class="grid grid-cols-4 gap-6 mb-6 my-8">
+                <a href="{% url 'user-dashboard' %}?type=all">
+                     <div class=" bg-white rounded-xl p-6 shadow-xl   ">
+                    <h3 class="text-gray-500 font-medium text-sm bg-red-1">Total Event</h3>
+                    <div class="flex justify-between items-center gap-5">
+                        <div>
+                            <p class="text-3xl font-semibold mb-1">{{counts.total}}</p>
+                            
+                        </div>
+                        <div class="rounded-full bg-blue-100 p-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="size-6 text-blue-800">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                            </svg>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                </a>
+               
+                <a href="{% url 'user-dashboard' %}?type=completed">
+                <div class=" bg-white rounded-xl p-6 shadow-xl  ">
+                    <h3 class="text-gray-500 font-medium text-sm">Completed Event </h3>
+                    <div class="flex justify-between items-center gap-5">
+                        <div>
+                            <p class="text-3xl font-semibold mb-1">{{counts.completed}}</p>
+                           
+                        </div>
+                        <div class="rounded-full bg-green-100 p-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="size-6 text-green-500">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+
+
+                        </div>
+                    </div>
+                </div>
+                </a>
+                <!-- Timer -->
+                 <a href="{% url 'user-dashboard' %}?type=in-progress">
+                     <div class=" bg-white rounded-xl p-6 shadow-xl  ">
+                    <h3 class="text-gray-500 font-medium text-sm">Event In Running</h3>
+                    <div class="flex justify-between items-center gap-5">
+                        <div>
+                            <p class="text-3xl font-semibold mb-1">{{counts.in_progress}}</p>
+                            
+                        </div>
+                        <div class="rounded-full bg-yellow-100 p-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="size-6 text-yellow-500">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                 </a>
+               
+                <!-- works -->
+                 <a href="{% url 'user-dashboard' %}?type=pending">
+                     <div class=" bg-white rounded-xl p-6 shadow-xl  ">
+                    <h3 class="text-gray-500 font-medium text-sm">To Day Event</h3>
+                    <div class="flex justify-between items-center gap-5">
+                        <div>
+                            <p class="text-3xl font-semibold mb-1">{{counts.pending}}</p>
+                            <p class="text-gray-500 text-sm"> </p>
+                        </div>
+                        <div class="rounded-full bg-purple-100 p-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="size-6 text-purple-500">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z" />
+                            </svg>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+                 </a>
+               
+            </div>
+              <div>
+      {% if messages %}
+        {% for message in messages %}
+        <div class="px-2 py-1 {% if message.tags == 'success' %}bg-green-500{% endif %}" >
+          {{message}}
+        </div>  
+        {% endfor %}
+       
+      {% endif %}
+    </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+ 
+ {% for task in tasks %}
+  <div class="flex flex-col bg-white/20 hover:bg-gray-200/40 backdrop-blur-md rounded-xl overflow-hidden shadow-md hover:shadow-xl transition mb-5">
+    
+ 
+<a href="{% url 'participant-details' task.id %}" class="block">
+  <div class="w-full h-40 overflow-hidden rounded-t-xl">
+    {% if task.image %}
+      <img
+        src="{{ task.image.url }}"
+        alt="{{ task.title }}"
+        class="w-full h-full object-cover"
+      >
+    {% else %}
+      <img
+        src="{% static 'images/default.jpg' %}"
+        alt="Default image"
+        class="w-full h-full object-cover"
+      >
+    {% endif %}
+  </div>
+</a>
+
+    <div class="p-4 space-y-3 flex-1">
+      {% comment %} <h3 class="font-semibold text-gray-800">{{ task.title }}</h3> {% endcomment %}
+      <a href="{% url 'participant-details' task.id %}" class="font-semibold text-gray-800">{{ task.title }}</a>
+
+      <div class="flex -space-x-2">
+        {% for emp in task.assigned_to.all %}
+          <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm border-2 border-white">
+            {{ emp.first_name|slice:":2" }}
+          </div>
+        {% endfor %}
+      </div>
+
+      <p class="text-sm text-gray-500">{{ task.create_at }}</p>
+    </div>
+
+   
+  
+
+  </div>
+ {% endfor %}
+</div>  
+           
+    </div>
+
+
+
+
+
+
+
+    <footer class="bg-gray-800 text-white py-12">
+      <div class="container mx-auto px-6">
+        <div class="flex flex-wrap justify-between">
+          <div class="w-full md:w-1/4 mb-8 md:mb-0">
+<a href="{% url 'home' %}" class="text-lg font-semibold mb-4 block">
+  EventMaster
+</a>
+
+
+            <p class="text-gray-400">
+              Empowering teams with efficient task management solutions.
+            </p>
+          </div>
+          <div class="w-full md:w-1/4 mb-8 md:mb-0">
+            <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+            <ul class="text-gray-400 space-y-2">
+              <li><a href="#" class="hover:text-white">Home</a></li>
+              <li><a href="#" class="hover:text-white">Features</a></li>
+              <li><a href="#" class="hover:text-white">Pricing</a></li>
+              <li><a href="#" class="hover:text-white">Contact</a></li>
+            </ul>
+          </div>
+          <div class="w-full md:w-1/4 mb-8 md:mb-0">
+            <h4 class="text-lg font-semibold mb-4">Connect</h4>
+            <ul class="text-gray-400 space-y-2">
+              <li><a href="#" class="hover:text-white">Twitter</a></li>
+              <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+              <li><a href="#" class="hover:text-white">Facebook</a></li>
+            </ul>
+          </div>
+          <div class="w-full md:w-1/4">
+            <h4 class="text-lg font-semibold mb-4">Newsletter</h4>
+            <form class="flex">
+              <input
+                type="email"
+                placeholder="Your email"
+                class="w-full px-3 py-2 text-gray-700 bg-gray-200 rounded-l-md focus:outline-none"
+                required
+              />
+              <button
+                type="submit"
+                class="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600 transition duration-300"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-700 mt-12 pt-8 text-sm text-center text-gray-400"
+        >
+          &copy; 2026 EventMaster. All rights reserved.
+        </div>
+      </div>
+    </footer>
+
+      <script>
+      document
+        .getElementById("menu-toggle")
+        .addEventListener("click", function () {
+          document.getElementById("mobile-menu").classList.toggle("hidden");
+        });
+
+      document
+        .getElementById("user-menu-button")
+        .addEventListener("click", function () {
+          document.getElementById("user-menu").classList.toggle("hidden");
+        });
+
+      // Close the dropdown when clicking outside
+      window.addEventListener("click", function (e) {
+        if (!document.getElementById("user-menu-button").contains(e.target)) {
+          document.getElementById("user-menu").classList.add("hidden");
+        }
+      });
+    </script>
+  </body>
+</html>
+
+  
+
