@@ -27,48 +27,41 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 
+import threading  # Add this at the top
+
+def send_email_wrapper(subject, message, from_email, recipient_list):
+    try:
+        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    except Exception as e:
+        print(f"Email background task failed: {e}")
+
 def sign_up(request):
     form = CustomRegistrationForm()
-
     if request.method == 'POST':
         form = CustomRegistrationForm(request.POST)
-
         if form.is_valid():
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password1'])
             user.is_active = False
             user.save()
 
-            # ✅ SEND EMAIL SAFELY (NON-BLOCKING)
             token = default_token_generator.make_token(user)
             activation_url = f"{settings.FRONTEND_URL}/users/activate/{user.id}/{token}/"
-
+            
             subject = "Activate your account"
-            message = f"""
-Hi {user.username},
+            message = f"Hi {user.username},\n\nActivate here: {activation_url}"
 
-Please activate your account using the link below:
-{activation_url}
+            # Run email sending in a separate thread so the user doesn't wait
+            email_thread = threading.Thread(
+                target=send_email_wrapper,
+                args=(subject, message, settings.EMAIL_HOST_USER, [user.email])
+            )
+            email_thread.start()
 
-Thank you
-"""
-
-            try:
-                send_mail(
-                    subject,
-                    message,
-                    settings.EMAIL_HOST_USER,
-                    [user.email],
-                    fail_silently=False,  # 🔑 CRITICAL
-                )
-            except Exception as e:
-                print("Email failed:", e)
-
-            messages.success(request, 'A confirmation email has been sent.')
+            messages.success(request, 'A confirmation email is being sent. Please check your inbox.')
             return redirect('sign-in')
 
     return render(request, 'registration/register.html', {"form": form})
-
 
 
 def sign_in(request):
