@@ -23,24 +23,52 @@ def is_manager(user):
 def is_participant(user):
     return user.groups.filter(name='Participant').exists()
 
+from django.conf import settings
+from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
+
 def sign_up(request):
     form = CustomRegistrationForm()
+
     if request.method == 'POST':
         form = CustomRegistrationForm(request.POST)
-            
+
         if form.is_valid():
-            user=form.save(commit=False)
-            # print('user',user)
-            user.set_password(form.cleaned_data.get('password1'))
-            # print(form.cleaned_data)
-            user.is_active=False
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password1'])
+            user.is_active = False
             user.save()
-            messages.success(request,'A confirmation mail sent. Please check your email')
+
+            # ✅ SEND EMAIL SAFELY (NON-BLOCKING)
+            token = default_token_generator.make_token(user)
+            activation_url = f"{settings.FRONTEND_URL}/users/activate/{user.id}/{token}/"
+
+            subject = "Activate your account"
+            message = f"""
+Hi {user.username},
+
+Please activate your account using the link below:
+{activation_url}
+
+Thank you
+"""
+
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=True,  # 🔑 CRITICAL
+                )
+            except Exception as e:
+                print("Email failed:", e)
+
+            messages.success(request, 'A confirmation email has been sent.')
             return redirect('sign-in')
 
-        else:
-            print("Form is not valid")
     return render(request, 'registration/register.html', {"form": form})
+
 
 
 def sign_in(request):
