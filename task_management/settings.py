@@ -102,11 +102,11 @@ WSGI_APPLICATION = 'task_management.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
+        # Replace this value with your local database's connection string.
+        default='postgresql://db_toay_user:n9oNEMc41z3DehmbCiAX5Q1GkDIp4aIW@dpg-d65dnvh5pdvs73d7ltg0-a.oregon-postgres.render.com/db_toay',
         conn_max_age=600
     )
 }
-
 
 # DATABASES = {
 #     'default': dj_database_url.parse(
