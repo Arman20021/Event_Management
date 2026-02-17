@@ -11,11 +11,11 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.views import View
 from django.utils.decorators import method_decorator
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic.base import ContextMixin
 from django.views.generic import ListView,DetailView
-# Create your views here.
+from django.views.generic import TemplateView
 
 
  
@@ -30,114 +30,107 @@ def is_participant(user):
 
 
 
-@login_required
-@user_passes_test(is_manager,login_url='no-permission')
-def manager_dashboard(request):
-    type_filter = request.GET.get('type', 'all')
-    query = request.GET.get('q', '').strip()  # search text
-
-    # Status counts
-    counts = Task.objects.aggregate(
-        total=Count('id'),
-        completed=Count('id', filter=Q(status="COMPLETED")),
-        in_progress=Count('id', filter=Q(status="IN_PROGRESS")),
-        pending=Count('id', filter=Q(status="PENDING"))
-    )
-
-    # Base query
-    tasks = Task.objects.select_related('details').prefetch_related('assigned_to')
-
-    # Apply status filter
-    if type_filter == 'completed':
-        tasks = tasks.filter(status='COMPLETED')
-    elif type_filter == 'in-progress':
-        tasks = tasks.filter(status='IN_PROGRESS')
-    elif type_filter == 'pending':
-        tasks = tasks.filter(status='PENDING')
-
-    # Apply search filter only on title
-    if query:
-        tasks = tasks.filter(title__icontains=query)
-
-    context = {
-        'tasks': tasks,
-        'counts': counts,
-        'query': query,
-        'type': type_filter,
-        'role':'manager'
-    }
-
-    return render(request, "dashboard/manager-dashboard.html", context)
-
-
-
-@login_required
-@user_passes_test(is_participant,login_url='no-permission')
-def employee_dashboard(request):
-    type_filter = request.GET.get('type', 'all')
-    query = request.GET.get('q', '').strip()  # search text
-
-    # Status counts
-    counts = Task.objects.aggregate(
-        total=Count('id'),
-        completed=Count('id', filter=Q(status="COMPLETED")),
-        in_progress=Count('id', filter=Q(status="IN_PROGRESS")),
-        pending=Count('id', filter=Q(status="PENDING"))
-    )
-
-    # Base query
-    tasks = Task.objects.select_related('details').prefetch_related('assigned_to')
-
-    # Apply status filter
-    if type_filter == 'completed':
-        tasks = tasks.filter(status='COMPLETED')
-    elif type_filter == 'in-progress':
-        tasks = tasks.filter(status='IN_PROGRESS')
-    elif type_filter == 'pending':
-        tasks = tasks.filter(status='PENDING')
-
-    # Apply search filter only on title
-    if query:
-        tasks = tasks.filter(title__icontains=query)
-
-    context = {
-        'tasks': tasks,
-        'counts': counts,
-        'query': query,
-        'type': type_filter,
-        'role':'manager'
-    }
-
-    return render(request, "dashboard/user_dashboard.html", context)
-
-
-
+class ManagerDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = "dashboard/manager-dashboard.html"
+    login_url = 'no-permission'
 
     
-@login_required   
-@permission_required("tasks.add_task",login_url='no-permission' )
-def create_task(request): 
-    task_form = TaskModelForm()
-    task_detail_form = TaskDetailModelForm()
+    def test_func(self):
+        return is_manager(self.request.user)
 
-    if request.method == "POST":
-        # Add request.FILES here!
-        task_form = TaskModelForm(request.POST, request.FILES)
-        task_detail_form = TaskDetailModelForm(request.POST)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
         
-        if task_form.is_valid() and task_detail_form.is_valid():
-            task = task_form.save()
-            task_detail=task_detail_form.save(commit=False)
-            task_detail.task=task
-            task_detail.save()
-            messages.success(request,"Task Created Successfully")
+        type_filter = self.request.GET.get('type', 'all')
+        query = self.request.GET.get('q', '').strip()
 
-            return redirect ('manager-dashboard')
+       
+        counts = Task.objects.aggregate(
+            total=Count('id'),
+            completed=Count('id', filter=Q(status="COMPLETED")),
+            in_progress=Count('id', filter=Q(status="IN_PROGRESS")),
+            pending=Count('id', filter=Q(status="PENDING"))
+        )
 
-    context={"task_form":task_form,'task_detail_form':task_detail_form}
-    return render (request,"dashboard/task_form.html",context)
+        # base queryset
+        tasks = Task.objects.select_related('details').prefetch_related('assigned_to')
 
+      
+        if type_filter == 'completed':
+            tasks = tasks.filter(status='COMPLETED')
+        elif type_filter == 'in-progress':
+            tasks = tasks.filter(status='IN_PROGRESS')
+        elif type_filter == 'pending':
+            tasks = tasks.filter(status='PENDING')
 
+     
+        if query:
+            tasks = tasks.filter(title__icontains=query)
+
+     
+        context.update({
+            'tasks': tasks,
+            'counts': counts,
+            'query': query,
+            'type': type_filter,
+            'role': 'manager',
+        })
+
+        return context
+class EmployeeDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = "dashboard/user_dashboard.html"
+    login_url = 'no-permission'
+
+   
+    def test_func(self):
+        return is_participant(self.request.user)
+
+   
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+       
+        type_filter = self.request.GET.get('type', 'all')
+        query = self.request.GET.get('q', '').strip()
+
+        # status counts
+        counts = Task.objects.aggregate(
+            total=Count('id'),
+            completed=Count('id', filter=Q(status="COMPLETED")),
+            in_progress=Count('id', filter=Q(status="IN_PROGRESS")),
+            pending=Count('id', filter=Q(status="PENDING"))
+        )
+
+       
+        tasks = Task.objects.select_related('details').prefetch_related('assigned_to')
+
+      
+        if type_filter == 'completed':
+            tasks = tasks.filter(status='COMPLETED')
+        elif type_filter == 'in-progress':
+            tasks = tasks.filter(status='IN_PROGRESS')
+        elif type_filter == 'pending':
+            tasks = tasks.filter(status='PENDING')
+
+        # apply search filter
+        if query:
+            tasks = tasks.filter(title__icontains=query)
+
+       
+        context.update({
+            'tasks': tasks,
+            'counts': counts,
+            'query': query,
+            'type': type_filter,
+            'role': 'employee',   
+        })
+
+        return context
+
+    
+ 
 
 #create decorators for class based view
 
@@ -177,16 +170,7 @@ class CreateTask(ContextMixin,LoginRequiredMixin,PermissionRequiredMixin,View):
 
 
 
-@login_required 
-@permission_required("tasks.view_task",login_url='no-permission' )
-def view_task(request):
-   
-    task_count=Task.objects.aggregate(num_task=Count('id'))
-  
-
-    return render (request,"show_task.html",{"task_count":task_count})
-
-
+ 
 
 
 class ViewTask(ListView):
@@ -206,7 +190,7 @@ class ViewTask(ListView):
 def update_task(request, id): 
     task = Task.objects.get(id=id)
     
-    # Check if task has details to avoid RelatedObjectDoesNotExist errors
+     
     task_details = getattr(task, 'details', None)
 
     if request.method == "POST":
@@ -222,11 +206,11 @@ def update_task(request, id):
             messages.success(request, "Task Updated Successfully")
             return redirect('update-task', id=id)
     else:
-        # This is a GET request - Show the forms with existing data
+         
         task_form = TaskModelForm(instance=task)
         task_detail_form = TaskDetailModelForm(instance=task_details)
 
-    # Now these variables exist whether it was a POST or a GET request
+     
     context = {
         "task_form": task_form,
         'task_detail_form': task_detail_form
