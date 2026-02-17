@@ -26,7 +26,7 @@
     <nav class="container mx-auto px-6 py-3">
       <div class="flex justify-between items-center">
         <a href="index.html" class="text-xl font-bold text-gray-800"
-          >Taskify</a
+          >Event Management</a
         >
         <div class="hidden md:flex space-x-4">
           <a
@@ -59,6 +59,7 @@
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >Dashboard</a
               >
+              
               <form method="post" action="{% url 'sign_out' %}">
                   {% csrf_token %}
                 <button
