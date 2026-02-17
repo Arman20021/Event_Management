@@ -9,7 +9,16 @@ from django.contrib.auth.decorators import user_passes_test,login_required,permi
 from users.views import is_admin
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
+from django.views import View
+from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.generic.base import ContextMixin
+from django.views.generic import ListView,DetailView
 # Create your views here.
+
+
+ 
 
 # views.py
 def is_manager(user):
@@ -106,7 +115,7 @@ def employee_dashboard(request):
 
     
 @login_required   
-@permission_required("tasks.add_task" )
+@permission_required("tasks.add_task",login_url='no-permission' )
 def create_task(request): 
     task_form = TaskModelForm()
     task_detail_form = TaskDetailModelForm()
@@ -123,58 +132,73 @@ def create_task(request):
             task_detail.save()
             messages.success(request,"Task Created Successfully")
 
-
-
-
-
             return redirect ('manager-dashboard')
-
-
-           
-
-
-            """For Django Form Data"""
-        #     data=form.cleaned_data
-        #     title=data.get('title')
-        #     description=data.get('description')
-        #     due_date=data.get('due_date')
-        #     assigned_to=data.get('assigned_to')
-
-
-        #     task=Task.objects.create(title=title,description=description,due_date=due_date)
-        #    #assign employee task
-        #     for emp_id in assigned_to:
-        #        employee=Employee.objects.get(id=emp_id)
-        #        task.assigned_to.add(employee)
-            
-            # return HttpResponse("Task Added Succesfully")
 
     context={"task_form":task_form,'task_detail_form':task_detail_form}
     return render (request,"dashboard/task_form.html",context)
 
+
+
+#create decorators for class based view
+
+create_decorators=[permission_required("tasks.add_task",login_url='no-permission' ),login_required]
+
+class CreateTask(ContextMixin,LoginRequiredMixin,PermissionRequiredMixin,View):
+    permission_required="tasks.add_task"
+    login_url='no-permission'
+    
+    def get_context_data(self, **kwargs)  :
+        context = super().get_context_data(**kwargs)
+        context['task_form']=kwargs.get('task_form',TaskModelForm) 
+        context['task_detail_form']=kwargs.get('task_detail_form',TaskDetailModelForm) 
+        return context
+    
+
+
+    def get(self,request,*args,**kwargs):
+ 
+        context=self.get_context_data()
+        return render (request,"dashboard/task_form.html",context)
+    
+
+    def post(self,request,*args,**kwargs):
+        task_form = TaskModelForm(request.POST, request.FILES)
+        task_detail_form = TaskDetailModelForm(request.POST)
+        
+        if task_form.is_valid() and task_detail_form.is_valid():
+            task = task_form.save()
+            task_detail=task_detail_form.save(commit=False)
+            task_detail.task=task
+            task_detail.save()
+            messages.success(request,"Task Created Successfully")
+            context=self.get_context_data(task_form=task_form,task_detail_form=task_detail_form)
+            return redirect ('manager-dashboard')
+
+
+
+
 @login_required 
-@permission_required("tasks.view_task",login_url='no-permission')
+@permission_required("tasks.view_task",login_url='no-permission' )
 def view_task(request):
-    #SHOW THE TASK ARE COMPLETED
-    # tasks=Task.objects.filter(status="COMPLETED")
-
-    #SHOW THE TASK WHICH DUE DATE IS TODAY
-    # tasks=Task.objects.filter(due_date=date.today())
-    '''Show the task which priority is not low'''
-    # tasks=TaskDetail.objects.exclude(priority='L')
-
-    """Show the task that contains c and status is pending"""
-    # tasks=TaskDetail.objects.filter(title__icontains='c',status='PENDING')
-
-    '''Show the task which are pending or in progress'''
-    # tasks=Task.objects.filter(Q(status='PENDING')|Q(status='IN_PROGRESS'))
-
-    # tasks=Task.objects.select_related('details').all()
-
+   
     task_count=Task.objects.aggregate(num_task=Count('id'))
   
 
     return render (request,"show_task.html",{"task_count":task_count})
+
+
+
+
+class ViewTask(ListView):
+    model=Project
+    context_object_name='projects'
+    template_name='show_task.html'
+
+
+
+
+
+
 
 
 @login_required   
@@ -248,6 +272,24 @@ def task_details(request,task_id):
         task.save()
         return redirect('task-details',task.id)
     return render (request,'task_details.html',{'task':task,'status_choices':status_choices})
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
 
 
 @login_required   

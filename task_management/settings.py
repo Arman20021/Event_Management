@@ -21,6 +21,8 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS=['https://*.onrender.com','http://127.0.0.1:8000']
 
+AUTH_USER_MODEL='users.CustomUser'
+
 
 # Application definition
 
@@ -84,29 +86,29 @@ WSGI_APPLICATION = 'task_management.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 # for postgress
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DB_NAME',default=''),
-#         'USER': config('DB_USER',default=''),
-#         'PASSWORD': config('DB_PASSWORD',default=''),
-#         'HOST': config('DB_HOST',default='local_host'),
-#         'PORT': config('DB_PORT',cast=int)
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME',default=''),
+        'USER': config('DB_USER',default=''),
+        'PASSWORD': config('DB_PASSWORD',default=''),
+        'HOST': config('DB_HOST',default='local_host'),
+        'PORT': config('DB_PORT',cast=int)
+    }
+}
 
 
 # Example for Postgres
  
 
 
-DATABASES = {
-    'default': dj_database_url.config(
-        # Replace this value with your local database's connection string.
-        default='postgresql://db_toay_user:n9oNEMc41z3DehmbCiAX5Q1GkDIp4aIW@dpg-d65dnvh5pdvs73d7ltg0-a.oregon-postgres.render.com/db_toay',
-        conn_max_age=600
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         # Replace this value with your local database's connection string.
+#         default='postgresql://db_toay_user:n9oNEMc41z3DehmbCiAX5Q1GkDIp4aIW@dpg-d65dnvh5pdvs73d7ltg0-a.oregon-postgres.render.com/db_toay',
+#         conn_max_age=600
+#     )
+# }
 
 # DATABASES = {
 #     'default': dj_database_url.parse(
@@ -138,7 +140,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Dhaka'
 
 USE_I18N = True
 
@@ -172,9 +174,12 @@ EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD =config('EMAIL_HOST_PASSWORD')
 
-FRONTEND_URL='https://last-repo-5uy2.onrender.com/'
+# FRONTEND_URL='https://last-repo-5uy2.onrender.com/'
 
-# FRONTEND_URL = 'http://127.0.0.1:8000'
+FRONTEND_URL = 'http://127.0.0.1:8000'
 
 LOGIN_URL='sign-in'
 # print("DATABASE_URL =", os.environ.get("DATABASE_URL"))
+
+# LOGIN_REDIRECT_URL='/tasks/dashboard'
+LOGOUT_REDIRECT_URL='/'

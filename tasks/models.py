@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
-
+ 
+from django.conf import settings
+ 
  
 
 class Project(models.Model):
@@ -14,7 +15,7 @@ class Project(models.Model):
 # Create your models here.
 class Task(models.Model):
 
-    attendees = models.ManyToManyField(User, related_name='rsvp_tasks', blank=True)
+    attendees = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='rsvp_tasks', blank=True)
 
     STATUS_CHOICES=[
         ('PENDING','Pending'),
@@ -29,7 +30,7 @@ class Task(models.Model):
     )
     # assigned_to=models.ManyToManyField(Employee,related_name='tasks')
     assets=models.ImageField(upload_to='task_asset',blank=True,null=True)
-    assigned_to=models.ManyToManyField(User,related_name='tasks')
+    assigned_to=models.ManyToManyField(settings.AUTH_USER_MODEL,related_name='tasks')
     title=models.CharField(max_length=250)
     description=models.TextField()
     due_date=models.DateField()
@@ -86,7 +87,7 @@ class Event(models.Model):
     time = models.TimeField()
     location = models.CharField(max_length=200)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    attendees = models.ManyToManyField(User, related_name='rsvp_events', blank=True)
+    attendees = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='rsvp_events', blank=True)
 
    
 
