@@ -86,29 +86,29 @@ WSGI_APPLICATION = 'task_management.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 # for postgress
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME',default=''),
-        'USER': config('DB_USER',default=''),
-        'PASSWORD': config('DB_PASSWORD',default=''),
-        'HOST': config('DB_HOST',default='local_host'),
-        'PORT': config('DB_PORT',cast=int)
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DB_NAME',default=''),
+#         'USER': config('DB_USER',default=''),
+#         'PASSWORD': config('DB_PASSWORD',default=''),
+#         'HOST': config('DB_HOST',default='local_host'),
+#         'PORT': config('DB_PORT',cast=int)
+#     }
+# }
 
 
 # Example for Postgres
  
 
 
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         # Replace this value with your local database's connection string.
-#         default='postgresql://event_manager_db_vuyu_user:YDdE3QP8spOGsRtyz8qkhmWW1Sw7z9XE@dpg-d6a9fki4d50c738ot47g-a.oregon-postgres.render.com/event_manager_db_vuyu',
-#         conn_max_age=600
-#     )
-# }
+DATABASES = {
+    'default': dj_database_url.config(
+        # Replace this value with your local database's connection string.
+        default='postgresql://event_manager_db_vuyu_user:YDdE3QP8spOGsRtyz8qkhmWW1Sw7z9XE@dpg-d6a9fki4d50c738ot47g-a.oregon-postgres.render.com/event_manager_db_vuyu',
+        conn_max_age=600
+    )
+}
 
 # DATABASES = {
 #     'default': dj_database_url.parse(
@@ -174,9 +174,9 @@ EMAIL_PORT = config('EMAIL_PORT')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD =config('EMAIL_HOST_PASSWORD')
 
-# FRONTEND_URL='https://last-repo-5uy2.onrender.com/'
+FRONTEND_URL='https://last-repo-5uy2.onrender.com/'
 
-FRONTEND_URL = 'http://127.0.0.1:8000'
+# FRONTEND_URL = 'http://127.0.0.1:8000'
 
 LOGIN_URL='sign-in'
 # print("DATABASE_URL =", os.environ.get("DATABASE_URL"))
